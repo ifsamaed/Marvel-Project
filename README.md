@@ -1,5 +1,10 @@
 # Welcome to Marvel-Project!
 
+<p align="justify">
+    <img src="https://img.shields.io/badge/Swift-5-orange.svg" />
+    <img src="https://img.shields.io/badge/Platforms-iOS-blue.svg?style=flat" />
+</p>
+
 In this project we can see an application that shows a list of Marvel superheroes and their details.
 
 ## API
@@ -13,7 +18,7 @@ The architecture is based on **MVP-C** with a coordinator pattern to help us dec
 - iOS 13.0+
 - XCode 11.0+
 - Swift 5
--
+
 ## Scope
 - **No Storyboards**: Cells view using .xib. No broken constraints. 
 - **Unit Tests*
@@ -25,7 +30,7 @@ The architecture is based on **MVP-C** with a coordinator pattern to help us dec
 ## Next improvements 
 - Show loading view at the end of table view 
 - Show empty view at favourites view controller 
-- Call other services 
+- Add new search filters
 - UI Test
 - Animate modal presentation
 
