@@ -1,0 +1,35 @@
+# Welcome to Marvel-Project!
+
+In this project we can see an application that shows a list of Marvel superheroes and their details.
+
+## API
+Consume Marvel API: https://developer.marvel.com/docs
+
+## Architecture 
+
+The architecture is based on **MVP-C** with a coordinator pattern to help us decouple the flow app from the view controllers
+
+## Requirements
+- iOS 13.0+
+- XCode 11.0+
+- Swift 5
+-
+## Scope
+- **No Storyboards**: Cells view using .xib. No broken constraints. 
+- **Unit Tests*
+- **No external framework**
+- **Efficiently loading images**
+- **Infinite scrolling**
+- **Filter character**
+
+## Next improvements 
+- Show loading view at the end of table view 
+- Show empty view at favourites view controller 
+- Call other services 
+- UI Test
+- Animate modal presentation
+
+## Video 
+https://user-images.githubusercontent.com/6013003/128643156-85be218f-76df-452d-8c02-edea2f974dc2.mp4
+
+
