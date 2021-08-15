@@ -31,8 +31,8 @@ final class CharacterTableViewCell: UITableViewCell {
     }
     
     @IBOutlet weak var spinner: UIActivityIndicatorView!
+    
     var viewModel: CharacterRepresentableViewModel?
-    weak var delegate: CharacterViewUpdatable?
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -43,34 +43,31 @@ final class CharacterTableViewCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
     }
     
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.characterImage.image = nil
+        self.characterImage.cancelImageLoad()
+        self.spinner.isHidden = true
+    }
+    
     func configure(_ viewModel: CharacterRepresentableViewModel) {
         self.viewModel = viewModel
         self.characterImage.image = viewModel.image
         self.characterName.text = viewModel.name
         if viewModel.image == nil {
-            self.spinner.startAnimating()
-        } else {
-            self.spinner.stopAnimating()
+            self.loadImage()
         }
     }
     
     func loadImage() {
+        self.spinner.startAnimating()
+        self.spinner.isHidden = false
         guard let viewModel = self.viewModel,
               let url = viewModel.url else { return }
-        ImageDataRepository.shared.load(url: url, item: viewModel) { fetchedItem, image in
-            if let img = image, img != fetchedItem.image {
-                self.delegate?.loadedImage(fetchedItem: fetchedItem, image: img)
-            }
+        characterImage.loadImage(at: url as URL, for: viewModel) { [weak self] in
+            self?.spinner.stopAnimating()
+            self?.spinner.isHidden = true
         }
     }
-    
-    func showImage(_ image: UIImage) {
-        self.characterImage.image = image
-        self.spinner.stopAnimating()
-        self.spinner.isHidden = true
-    }
-}
 
-private extension CharacterTableViewCell {
-    
 }

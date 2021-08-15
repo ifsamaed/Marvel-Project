@@ -16,14 +16,27 @@
                 <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
-                    <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="gic-1H-OWA">
-                        <rect key="frame" x="150" y="12" width="20" height="20"/>
-                    </activityIndicatorView>
+                    <stackView opaque="NO" contentMode="scaleToFill" distribution="fillProportionally" spacing="16" translatesAutoresizingMaskIntoConstraints="NO" id="KpS-ZQ-VZP">
+                        <rect key="frame" x="92.5" y="12" width="135.5" height="20"/>
+                        <subviews>
+                            <activityIndicatorView opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="750" verticalHuggingPriority="750" style="medium" translatesAutoresizingMaskIntoConstraints="NO" id="gic-1H-OWA">
+                                <rect key="frame" x="0.0" y="0.0" width="20" height="20"/>
+                            </activityIndicatorView>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Please wait..." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="WYb-d5-3Jk">
+                                <rect key="frame" x="36" y="0.0" width="99.5" height="20"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                    </stackView>
                 </subviews>
                 <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                 <constraints>
-                    <constraint firstItem="gic-1H-OWA" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="Jsi-mH-fC3"/>
-                    <constraint firstItem="gic-1H-OWA" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="rnN-cw-FcI"/>
+                    <constraint firstAttribute="bottom" relation="greaterThanOrEqual" secondItem="KpS-ZQ-VZP" secondAttribute="bottom" constant="12" id="bXs-g7-hzp"/>
+                    <constraint firstItem="KpS-ZQ-VZP" firstAttribute="centerX" secondItem="H2p-sc-9uM" secondAttribute="centerX" id="vKA-5i-Msu"/>
+                    <constraint firstItem="KpS-ZQ-VZP" firstAttribute="centerY" secondItem="H2p-sc-9uM" secondAttribute="centerY" id="yfp-vb-RZf"/>
+                    <constraint firstItem="KpS-ZQ-VZP" firstAttribute="top" relation="greaterThanOrEqual" secondItem="H2p-sc-9uM" secondAttribute="top" constant="12" id="zaa-da-5Fs"/>
                 </constraints>
             </tableViewCellContentView>
             <viewLayoutGuide key="safeArea" id="njF-e1-oar"/>

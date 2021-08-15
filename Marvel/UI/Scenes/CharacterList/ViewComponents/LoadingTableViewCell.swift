@@ -7,10 +7,18 @@
 
 import UIKit
 
-class LoadingTableViewCell: UITableViewCell {
+class LoadingTableViewCell: UITableViewHeaderFooterView {
+    
     @IBOutlet weak var spinner: UIActivityIndicatorView!
+    
+    override func prepareForReuse() {
+        super.prepareForReuse()
+        self.spinner.startAnimating()
+    }
     
     override func awakeFromNib() {
         super.awakeFromNib()
+        self.spinner.startAnimating()
+        self.contentView.backgroundColor = .white
     }    
 }

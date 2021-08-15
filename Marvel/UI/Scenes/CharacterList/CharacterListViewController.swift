@@ -7,11 +7,6 @@
 
 import UIKit
 
-
-protocol CharacterViewUpdatable: AnyObject {
-    func loadedImage(fetchedItem: CharacterRepresentableViewModel, image: UIImage)
-}
-
 protocol CharacterListViewProtocol: AnyObject {
     func showCharacters(_ viewModels: [CharacterRepresentableViewModel])
     func appendNewCharacters(_ characters: [CharacterRepresentableViewModel])
@@ -22,12 +17,11 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     // MARK: - Value Types
     typealias DataSource = UITableViewDiffableDataSource<CharactersSection, CharacterRepresentableViewModel>
     typealias Snapshot = NSDiffableDataSourceSnapshot<CharactersSection, CharacterRepresentableViewModel>
-    
-    private var tableViewDataSource: DataSource?
+
+    private lazy var tableViewDataSource: DataSource = makeDataSource()
     private let presenter: CharacterListPresenterProtocol
     private var characters: [CharacterRepresentableViewModel] = []
     private var filterCharacters: [CharacterRepresentableViewModel] = []
-    private var isFilteringEnable = false
     private var isFetchingMore: Bool = false
     
     enum Section: Int {
@@ -46,7 +40,6 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     override func viewDidLoad() {
         super.viewDidLoad()
         self.configureTableView()
-        self.loadDataSource()
         self.presenter.viewDidLoad()
     }
     
@@ -68,59 +61,66 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
         return view
     }
     
+    override func tableView(_ tableView: UITableView, viewForFooterInSection section: Int) -> UIView? {
+        let cell = tableView.dequeueReusableHeaderFooterView(withIdentifier: "LoadingTableViewCell") as? LoadingTableViewCell
+        return cell
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
+        if isFetchingMore {
+            return UITableView.automaticDimension
+        } else {
+            return .leastNonzeroMagnitude
+        }
+    }
+    
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         if offsetY > contentHeight - scrollView.frame.size.height {
-            if !isFetchingMore && !isFilteringEnable {
+            if !isFetchingMore && filterCharacters.isEmpty {
                 self.beginBatchFetch()
             }
         }
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let selectedCharacters =  self.tableViewDataSource?.itemIdentifier(for: indexPath) else { return }
+        guard let selectedCharacters =  self.tableViewDataSource.itemIdentifier(for: indexPath) else { return }
         self.presenter.didTapCharacter(selectedCharacters)
     }
 }
 
 private extension CharacterListViewController {
-    func loadDataSource() {
-        self.tableViewDataSource = DataSource(tableView: tableView, cellProvider: { tableView, indexPath, item in
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: "CharacterTableViewCell") as? CharacterTableViewCell else {
-                return UITableViewCell()
+    func makeDataSource() -> DataSource {
+        return DataSource(
+            tableView: tableView,
+            cellProvider: { tableView, indexPath, item in
+                let cell = tableView.dequeueReusableCell(withIdentifier: "CharacterTableViewCell") as? CharacterTableViewCell
+                cell?.configure(item)
+                return cell
             }
-            cell.delegate = self
-            if self.isFilteringEnable {
-                guard self.filterCharacters.indices.contains(indexPath.row) else { return UITableViewCell() }
-                cell.configure(self.filterCharacters[indexPath.row])
-            } else {
-                cell.configure(self.characters[indexPath.row])
-            }
-            cell.loadImage()
-            return cell
-        })
+        )
     }
     
     func updateDataSource(_ characters: [CharacterRepresentableViewModel]) {
         var snapShot = Snapshot()
         snapShot.appendSections([.main])
         snapShot.appendItems(characters)
-        self.tableViewDataSource?.apply(snapShot, animatingDifferences: false)
+        self.tableViewDataSource.apply(snapShot, animatingDifferences: false)
     }
     
-    func updateDataSource(animatingDifferences: Bool) {
+    func updateDataSource(animatingDifferences: Bool = false) {
         var snapShot = Snapshot()
         snapShot.appendSections([.main])
         snapShot.appendItems(characters)
-        self.tableViewDataSource?.apply(snapShot, animatingDifferences: animatingDifferences)
+        self.tableViewDataSource.apply(snapShot, animatingDifferences: animatingDifferences)
     }
-    
 }
 
 private extension CharacterListViewController {
     func beginBatchFetch() {
         self.isFetchingMore = true
+        self.updateDataSource()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.presenter.loadMoreCharacters()
         }
@@ -136,38 +136,28 @@ private extension CharacterListViewController {
         self.registerCells()
         self.tableView.separatorStyle = .none
         self.tableView.backgroundColor = .clear
+        self.tableViewDataSource.defaultRowAnimation = .fade
+        self.tableView.tableFooterView?.isHidden = true
+
     }
 }
 
-extension CharacterListViewController: CharacterViewUpdatable {
-    func loadedImage(fetchedItem: CharacterRepresentableViewModel, image: UIImage) {
-        if fetchedItem.image != image && !isFilteringEnable {
-            if var updatedSnapshot = self.tableViewDataSource?.snapshot(),
-               let datasourceIndex = updatedSnapshot.indexOfItem(fetchedItem),
-               self.characters.indices.contains(datasourceIndex) {
-                let character = self.characters[datasourceIndex]
-                character.image = image
-                updatedSnapshot.reloadItems([character])
-                self.tableViewDataSource?.apply(updatedSnapshot, animatingDifferences: false)
-                
-            }
-        }
-    }
-}
-
-extension CharacterListViewController: SearchResultsDelegate {
+extension CharacterListViewController: SearchHeaderViewDelegate {
     func updateSearchResults(_ searchText: String) {
+        self.tableView.scrollToTop(animated: true)
         guard !searchText.isEmpty else {
-            self.isFilteringEnable = false
+            self.filterCharacters = []
             self.updateDataSource(characters)
-            self.tableView.scrollToTop(animated: true)
             return
         }
         self.filterCharacters = self.characters.filter { $0.name.contains(searchText) }
-        self.isFilteringEnable = true
         self.updateDataSource(filterCharacters)
-        self.tableView.scrollToTop(animated: true)
     }
+    
+    func didTapOnAdvancedSearch() {
+        
+    }
+
 }
 
 private extension UITableView {

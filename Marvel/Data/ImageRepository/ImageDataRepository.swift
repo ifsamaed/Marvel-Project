@@ -10,25 +10,34 @@ import Foundation
 
 final class ImageDataRepository {
     static let shared = ImageDataRepository()
-    private var loadingResponses = [NSURL: [(CharacterRepresentableViewModel, UIImage?) -> Swift.Void]]()
+    private var loadingResponses = [NSURL: [(CharacterRepresentableViewModel, UIImage?) -> Void]]()
+    private var runningRequests = [CharacterRepresentableViewModel: URLSessionDataTask]()
     private var imageCache = ImageCache()
-    private var imageNetworking = ImageNetworking()
-
-    func load(url: NSURL, item: CharacterRepresentableViewModel, completion: @escaping (CharacterRepresentableViewModel, UIImage?) -> Swift.Void) {
-        
+    
+    func load(url: NSURL, item: CharacterRepresentableViewModel, completion: @escaping (CharacterRepresentableViewModel, UIImage?) -> Void) {
         if let image = self.imageCache.load(url: url, item: item) {
-            DispatchQueue.main.async {
-                completion(item, image)
-            }
+            completion(item, image)
             return
         }
         
-        if self.loadingResponses[url] != nil {
-            self.loadingResponses[url]?.append(completion)
-        } else {
-            self.loadingResponses[url] = [completion]
+        let task = URLSession.shared.dataTask(with: url as URL) { (data, response, error) in
+            defer { self.runningRequests.removeValue(forKey: item) }
+            guard
+                error == nil,
+                let responseData = data,
+                let image = UIImage(data: responseData) else {
+                completion(item , nil)
+                return
+            }
+            self.imageCache.setImage(image, url: url, responseData: responseData)
+            completion(item, image)
         }
-        
-        self.imageNetworking.load(url: url, item: item, loadingResponses: self.loadingResponses, cache: imageCache, completion: completion)
+        task.resume()
+        runningRequests[item] = task
+    }
+    
+    func cancelLoad(_ item: CharacterRepresentableViewModel) {
+        runningRequests[item]?.cancel()
+        runningRequests.removeValue(forKey: item)
     }
 }
