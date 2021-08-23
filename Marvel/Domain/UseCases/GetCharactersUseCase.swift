@@ -8,7 +8,11 @@
 import Foundation
 
 final class GetCharactersUseCase {
-    private let dataRepository = DataRepository()
+    private let dataRepository: DataRepositoryProtocol
+    
+    init(repository: DataRepositoryProtocol) {
+        self.dataRepository = repository
+    }
     
     func execute(offset: Int) throws -> CharactersViewModel {
         return try dataRepository.getAllCharacters(offset: offset)

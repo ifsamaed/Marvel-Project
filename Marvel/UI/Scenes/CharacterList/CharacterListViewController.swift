@@ -19,13 +19,17 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     typealias Snapshot = NSDiffableDataSourceSnapshot<CharactersSection, CharacterRepresentableViewModel>
 
     private lazy var tableViewDataSource: DataSource = makeDataSource()
+    private lazy var tableViewAdvancedDataSource: UITableViewDiffableDataSource<AdvancedSearchSection, AdvancedSearchViewModel> = makeAdvancedDataSource()
+    
+    let mocks = [AdvancedSearchViewModel()]
+
     private let presenter: CharacterListPresenterProtocol
     private var characters: [CharacterRepresentableViewModel] = []
     private var filterCharacters: [CharacterRepresentableViewModel] = []
     private var isFetchingMore: Bool = false
     
-    enum Section: Int {
-        case character = 0
+    enum AdvancedSearchSection: Int {
+        case row = 0
     }
     
     init(presenter: CharacterListPresenterProtocol) {
@@ -102,6 +106,14 @@ private extension CharacterListViewController {
         )
     }
     
+    func makeAdvancedDataSource() -> UITableViewDiffableDataSource<AdvancedSearchSection, AdvancedSearchViewModel> {
+        return UITableViewDiffableDataSource<AdvancedSearchSection, AdvancedSearchViewModel>(tableView: tableView) {
+            (tableView: UITableView, indexPath: IndexPath, item: AdvancedSearchViewModel) -> UITableViewCell? in
+            let cell = tableView.dequeueReusableCell(withIdentifier: "AdvancedSearchCell", for: indexPath)
+            return cell
+        }
+    }
+    
     func updateDataSource(_ characters: [CharacterRepresentableViewModel]) {
         var snapShot = Snapshot()
         snapShot.appendSections([.main])
@@ -130,6 +142,7 @@ private extension CharacterListViewController {
         self.tableView.register(UINib(nibName: "CharacterTableViewCell", bundle: nil), forCellReuseIdentifier: "CharacterTableViewCell")
         self.tableView.register(UINib(nibName: "SearchHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SearchHeaderView")
         self.tableView.register(UINib(nibName: "LoadingTableViewCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "LoadingTableViewCell")
+        self.tableView.register(UINib(nibName: "AdvancedSearchCell", bundle: nil), forCellReuseIdentifier: "AdvancedSearchCell")
     }
     
     func configureTableView() {
@@ -155,7 +168,10 @@ extension CharacterListViewController: SearchHeaderViewDelegate {
     }
     
     func didTapOnAdvancedSearch() {
-        
+//        var snapShot = NSDiffableDataSourceSnapshot<AdvancedSearchSection, AdvancedSearchViewModel>()
+//        snapShot.appendSections([.row])
+//        snapShot.appendItems(mocks)
+//        self.tableViewAdvancedDataSource.apply(snapShot, animatingDifferences: false)
     }
 
 }

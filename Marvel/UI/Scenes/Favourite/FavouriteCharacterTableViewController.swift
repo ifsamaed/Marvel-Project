@@ -8,12 +8,13 @@
 import UIKit
 
 protocol FavouriteCharacterViewProtocol: AnyObject {
-    func showCharacters(_ characters: [CharacterRepresentableViewModel])
-    func updateDeleteCharacter(_ characters: [CharacterRepresentableViewModel], index: IndexPath)
+    func showCharacters(_ characters: [FavouriteCharacterRepresentableViewModel])
+    func updateDeleteCharacter(_ characters: [FavouriteCharacterRepresentableViewModel], index: IndexPath)
+    func showError(_ error: String)
 }
 
 final class FavouriteCharacterTableViewController: UITableViewController, FavouriteCharacterViewProtocol {
-    private var characters: [CharacterRepresentableViewModel] = []
+    private var characters: [FavouriteCharacterRepresentableViewModel] = []
     private let presenter: FavouriteCharacterPresenterProtocol
     
     init(presenter: FavouriteCharacterPresenterProtocol) {
@@ -35,14 +36,19 @@ final class FavouriteCharacterTableViewController: UITableViewController, Favour
         self.presenter.viewWillAppear()
     }
     
-    func showCharacters(_ characters: [CharacterRepresentableViewModel]) {
+    func showCharacters(_ characters: [FavouriteCharacterRepresentableViewModel]) {
         self.characters = characters
         self.tableView.reloadData()
     }
-    
-    func updateDeleteCharacter(_ characters: [CharacterRepresentableViewModel], index: IndexPath) {
+
+    func updateDeleteCharacter(_ characters: [FavouriteCharacterRepresentableViewModel], index: IndexPath) {
         self.characters = characters
         self.tableView.deleteRows(at: [index], with: .automatic)
+    }
+    
+    func showError(_ error: String) {
+        let alert = UIAlertController(title: "Error", message: error, preferredStyle: .alert)
+        self.present(alert, animated: true, completion: nil)
     }
     
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -58,7 +64,7 @@ final class FavouriteCharacterTableViewController: UITableViewController, Favour
         if characters.isEmpty {
             cell.textLabel?.text = "No favourite found"
         } else {
-            cell.imageView?.image = characters[indexPath.row].image
+            cell.imageView?.image = UIImage(data: characters[indexPath.row].image ?? Data())
             cell.layer.borderColor = UIColor.white.cgColor
             cell.layer.borderWidth = 3
             cell.textLabel?.text = characters[indexPath.row].name

@@ -1,5 +1,5 @@
 //
-//  MarvelRemoteDataSource.swift
+//  NetworkingDataSource.swift
 //  Marvel
 //
 //  Created by Margaret López Calderón on 5/8/21.
@@ -11,11 +11,11 @@ enum RemoteDataSourceError: Error {
     case service
 }
 
-protocol RemoteDataSourceProtocol {
+protocol DataSourceProtocol {
     func getAllCharacters(inputParam: GellAllCharactersInput?) throws -> Characters
 }
 
-final class MarvelRemoteDataSource: RemoteDataSourceProtocol {
+final class NetworkingDataSource: DataSourceProtocol {
     private let netClient = NetworkingClient()
     private let authenticationManager: AuthenticationManager
     private let api = MarvelApi()

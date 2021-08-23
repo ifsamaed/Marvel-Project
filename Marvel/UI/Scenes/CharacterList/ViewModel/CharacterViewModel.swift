@@ -10,17 +10,10 @@ import UIKit
 
 enum CharactersSection: Hashable {
     case main
-    case loading
-}
-
-enum Wrapper: Hashable {
-    case characters([CharacterRepresentableViewModel])
-    case loading
 }
 
 class CharacterRepresentableViewModel: Hashable {
-    let id = UUID()
-    let characterID: Int?
+    let characterID: Int
     let name: String
     let description: String?
     var image: UIImage?
@@ -31,17 +24,17 @@ class CharacterRepresentableViewModel: Hashable {
     var isFavourite: Bool = false
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
+        hasher.combine(self.characterID)
         hasher.combine(self.name)
     }
     
     static func == (lsh: CharacterRepresentableViewModel, rhs: CharacterRepresentableViewModel) -> Bool {
         return
-            lsh.id == rhs.id &&
+            lsh.characterID == rhs.characterID &&
             lsh.name == rhs.name
     }
     
-    init(characterID: Int?, name: String, description: String, url: String, comics: [String], series: [String], events: [String]) {
+    init(characterID: Int, name: String, description: String, url: String, comics: [String], series: [String], events: [String]) {
         self.characterID = characterID
         self.name = name
         self.description = description.isEmpty ? "This character doesn't have any description at this moment" : description

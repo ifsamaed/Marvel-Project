@@ -8,13 +8,13 @@
 
 import UIKit
 
-protocol SearchResultsDelegate: AnyObject {
+protocol SearchHeaderViewDelegate: AnyObject {
     func updateSearchResults(_ searchText: String)
+    func didTapOnAdvancedSearch()
 }
 
 class SearchHeaderView: UITableViewHeaderFooterView {
     @IBOutlet weak var searchBar: UISearchBar!
-    @IBOutlet weak var searchTitle: UILabel!
     @IBOutlet weak var moreButton: UIButton! {
         didSet {
             moreButton.setImage(UIImage(systemName: "plus"), for: .normal)
@@ -22,8 +22,8 @@ class SearchHeaderView: UITableViewHeaderFooterView {
         }
     }
     
-    weak var delegate: SearchResultsDelegate?
-    
+    weak var delegate: SearchHeaderViewDelegate?
+
     override init(reuseIdentifier: String?) {
         super.init(reuseIdentifier: reuseIdentifier)
         setupView()
@@ -43,7 +43,7 @@ class SearchHeaderView: UITableViewHeaderFooterView {
     }
     
     @IBAction func didTapOnMoreButton(_ sender: Any) {
-
+        self.delegate?.didTapOnAdvancedSearch()
     }
     
 }

@@ -7,22 +7,11 @@
 
 import Foundation
 import UIKit
+import CoreData
 
-protocol FlowCoordinator: AnyObject {
-    var parentCoordinator: MainBaseCoordinator? { get set }
-}
-
-protocol Coordinator: FlowCoordinator {
+protocol Coordinator {
     var rootViewController: UIViewController { get set }
     func start() -> UIViewController
-}
-
-protocol MainBaseCoordinator {
-    var charactersCoordinator: CharactersBaseCoordinator { get }
-}
-
-protocol CharactersBaseCoordinator: Coordinator {
-    func showDetail(viewModel: CharacterRepresentableViewModel)
 }
 
 protocol HomeBaseCoordinated {

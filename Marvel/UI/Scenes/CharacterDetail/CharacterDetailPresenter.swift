@@ -6,33 +6,44 @@
 //
 
 import Foundation
+import CoreData
 
 protocol CharacterDetailPresenterProtocol {
     var view: CharacterDetailViewProtocol? { get set }
     func viewDidLoad()
     func saveFavourite(isFavourite: Bool)
-
+    
 }
 
 final class CharacterDetailPresenter: CharacterDetailPresenterProtocol {
     weak var view: CharacterDetailViewProtocol?
     private let viewModel: CharacterRepresentableViewModel
-    private var favouriteSingleton = FavouriteCharactersSingleton.shared
-
-    init(_ viewModel: CharacterRepresentableViewModel) {
+    private let container: NSPersistentContainer
+    
+    init(_ viewModel: CharacterRepresentableViewModel, container: NSPersistentContainer) {
         self.viewModel = viewModel
+        self.container = container
     }
     
     func viewDidLoad() {
+        viewModel.isFavourite = (try? PersistentFavouriteContainer
+            .isFavourite(
+                Int32(viewModel.characterID),
+                context: container.viewContext
+            )
+        ) ?? false
         self.view?.show(viewModel)
     }
     
     func saveFavourite(isFavourite: Bool) {
+        let favouriteViewModel = FavouriteCharacterRepresentableViewModel(
+            id: Int32(viewModel.characterID),
+            image: viewModel.image?.pngData(),
+            name: viewModel.name)
         if isFavourite {
-            self.favouriteSingleton.characters.append(viewModel)
+            PersistentFavouriteContainer.saveFavourite(favouriteViewModel, context: container.viewContext)
         } else {
-            guard let index = favouriteSingleton.characters.firstIndex(where: { $0.id == viewModel.id }) else { return }
-            self.favouriteSingleton.characters.remove(at: index)
+            try? PersistentFavouriteContainer.removeFavourite(favouriteViewModel, backgroundContext: container.viewContext)
         }
     }
     

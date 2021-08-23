@@ -25,7 +25,7 @@ struct CharactersViewModel {
 }
 
 struct CharacterViewModel {
-    let characterID: Int?
+    let characterID: Int
     let name: String
     let description: String?
     let thumbnail: ThumbnailViewModel?
@@ -36,7 +36,7 @@ struct CharacterViewModel {
     let urls: [URLTypeViewModel]
     
     init(_ dto: CharactersResult) {
-        self.characterID = dto.id
+        self.characterID = dto.id ?? UUID().hashValue
         self.name = dto.name ?? ""
         self.description = dto.resultDescription
         self.thumbnail = ThumbnailViewModel(dto.thumbnail)

@@ -12,10 +12,10 @@ protocol DataRepositoryProtocol {
 }
 
 final class DataRepository: DataRepositoryProtocol {
-    let dataSource: RemoteDataSourceProtocol
+    private let dataSource: DataSourceProtocol
     
-    init() {
-        self.dataSource = MarvelRemoteDataSource()
+    init(dataSource: DataSourceProtocol) {
+        self.dataSource = dataSource
     }
 
     func getAllCharacters(offset: Int) throws -> CharactersViewModel {

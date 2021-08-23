@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import CoreData
 
 protocol FavouriteCharacterPresenterProtocol: AnyObject {
     var view: FavouriteCharacterViewProtocol? { get set }
@@ -15,20 +16,25 @@ protocol FavouriteCharacterPresenterProtocol: AnyObject {
 
 final class FavouriteCharacterPresenter: FavouriteCharacterPresenterProtocol {
     weak var view: FavouriteCharacterViewProtocol?
-    private var favouriteSingleton = FavouriteCharactersSingleton.shared
-    private var characters: [CharacterRepresentableViewModel] = []
+    private var characters: [FavouriteCharacterRepresentableViewModel] = []
+    private let container: NSPersistentContainer
 
-    func viewWillAppear() {
-        let local = FavouriteCharactersSingleton.shared
-        self.characters = local.characters
-        self.view?.showCharacters(self.characters)
+    init(container: NSPersistentContainer) {
+        self.container = container
     }
     
-    func removeFavourite(_ index: IndexPath) {
-        guard self.characters.indices.contains(index.row),
-              let indexCharacter = favouriteSingleton.characters.firstIndex(where: { $0.id == characters[index.row].id }) else { return }
-        self.favouriteSingleton.characters.remove(at: indexCharacter)
-        self.characters = FavouriteCharactersSingleton.shared.characters
-        self.view?.updateDeleteCharacter(FavouriteCharactersSingleton.shared.characters, index: index)
+    func viewWillAppear() {
+        self.characters = PersistentFavouriteContainer.fetchFavourites(context: container.viewContext)
+        self.view?.showCharacters(characters)
+    }
+    
+    func removeFavourite(_ indexPath: IndexPath) {
+        do {
+            try PersistentFavouriteContainer.removeFavourite(characters[indexPath.row], backgroundContext: container.viewContext)
+            self.characters = PersistentFavouriteContainer.fetchFavourites(context: container.viewContext)
+            view?.updateDeleteCharacter(characters, index: indexPath)
+        } catch let error {
+            view?.showError(error.localizedDescription)
+        }
     }
 }

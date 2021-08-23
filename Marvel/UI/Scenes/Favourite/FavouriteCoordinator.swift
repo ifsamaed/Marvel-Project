@@ -7,13 +7,24 @@
 
 import Foundation
 import UIKit
+import CoreData
 
-final class FavouritesCoordinator: Coordinator {
-    var parentCoordinator: MainBaseCoordinator?
+
+protocol FavouritesBaseCoordinator: Coordinator {
+    var container: NSPersistentContainer? { get set }
+}
+
+final class FavouritesCoordinator: FavouritesBaseCoordinator {
+    var container: NSPersistentContainer?
     lazy var rootViewController: UIViewController = UIViewController()
 
+    init(container: NSPersistentContainer) {
+        self.container = container
+    }
+    
     func start() -> UIViewController {
-        let presenter = FavouriteCharacterPresenter()
+        guard let container = self.container else { return UIViewController() }
+        let presenter = FavouriteCharacterPresenter(container: container)
         let viewController = FavouriteCharacterTableViewController(presenter: presenter)
         self.rootViewController = UINavigationController(rootViewController: viewController)
         presenter.view = viewController

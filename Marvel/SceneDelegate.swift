@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import CoreData
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -15,7 +16,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let windowScene = (scene as? UIWindowScene) else { return }
         window = UIWindow(frame: UIScreen.main.bounds)
     
-        let baseViewController = MainCoordinator().start()
+        let baseViewController = MainCoordinator().start(container: persistentContainer)
         self.window?.rootViewController = baseViewController
         self.window?.makeKeyAndVisible()
         self.window?.windowScene = windowScene
@@ -49,6 +50,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // to restore the scene back to its current state.
     }
 
-
+    lazy var persistentContainer: NSPersistentContainer = {
+            let container = NSPersistentContainer(name: "Model")
+            container.loadPersistentStores { description, error in
+                if let error = error {
+                    fatalError("Unable to load persistent stores: \(error)")
+                }
+            }
+            return container
+        }()
 }
 

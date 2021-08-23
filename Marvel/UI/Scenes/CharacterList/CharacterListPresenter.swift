@@ -12,6 +12,7 @@ protocol CharacterListPresenterProtocol: AnyObject {
     func viewDidLoad()
     func loadMoreCharacters()
     func didTapCharacter(_ character: CharacterRepresentableViewModel)
+    func didTapOnAdvancedSearch()
 }
 
 final class CharacterListPresenter: CharacterListPresenterProtocol {
@@ -40,6 +41,10 @@ final class CharacterListPresenter: CharacterListPresenterProtocol {
     func didTapCharacter(_ character: CharacterRepresentableViewModel) {
         self.coordinator.showDetail(viewModel: character)
     }
+    
+    func didTapOnAdvancedSearch() {
+        self.coordinator.showAdvancedSearch()
+    }
 }
 
 private extension CharacterListPresenter {
@@ -48,7 +53,7 @@ private extension CharacterListPresenter {
             guard offset > limit else {
                 return []
             }
-            let charactersDomain = try GetCharactersUseCase()
+            let charactersDomain = try GetCharactersUseCase(repository: DataRepository(dataSource: NetworkingDataSource()))
                 .execute(offset: offset)
             let charactersViewModelRepresentable = charactersDomain
                 .characters
