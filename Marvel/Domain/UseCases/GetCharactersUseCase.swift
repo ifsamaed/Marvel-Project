@@ -11,7 +11,7 @@ final class GetCharactersUseCase {
     private let dataRepository: DataRepositoryProtocol
     
     init(repository: DataRepositoryProtocol) {
-        self.dataRepository = repository
+        dataRepository = repository
     }
     
     func execute(offset: Int) throws -> CharactersViewModel {

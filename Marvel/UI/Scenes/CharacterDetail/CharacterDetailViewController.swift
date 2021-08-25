@@ -15,37 +15,37 @@ class CharacterDetailViewController: UIViewController, CharacterDetailViewProtoc
     
     @IBOutlet weak var characterImage: UIImageView! {
         didSet {
-            self.characterImage.contentMode = .scaleAspectFill
+            characterImage.contentMode = .scaleAspectFill
             let tap = UITapGestureRecognizer(target: self, action: #selector(doubleTapImage))
              tap.numberOfTapsRequired = 2
-            self.characterImage.addGestureRecognizer(tap)
-            self.characterImage.isUserInteractionEnabled = true
+            characterImage.addGestureRecognizer(tap)
+            characterImage.isUserInteractionEnabled = true
         }
     }
     @IBOutlet weak var heartButton: UIButton! {
         didSet {
-            self.heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
-            self.heartButton.setImage(UIImage(systemName: "heart.fill"), for: .selected)
+            heartButton.setImage(UIImage(systemName: "heart"), for: .normal)
+            heartButton.setImage(UIImage(systemName: "heart.fill"), for: .selected)
         }
     }
     @IBOutlet weak var nameLabel: UILabel!
     @IBOutlet weak var descriptionLabel: UILabel!
     @IBOutlet weak var heartForegroundImage: UIImageView! {
         didSet {
-            self.heartForegroundImage.tintColor = .white
-            self.heartForegroundImage.alpha = 0.0
-            self.heartForegroundImage.layer.shadowColor = UIColor.black.cgColor
-            self.heartForegroundImage.layer.shadowOpacity = 0.5
-            self.heartForegroundImage.layer.shadowOffset = .zero
-            self.heartForegroundImage.layer.shadowRadius = 5
+            heartForegroundImage.tintColor = .white
+            heartForegroundImage.alpha = 0.0
+            heartForegroundImage.layer.shadowColor = UIColor.black.cgColor
+            heartForegroundImage.layer.shadowOpacity = 0.5
+            heartForegroundImage.layer.shadowOffset = .zero
+            heartForegroundImage.layer.shadowRadius = 5
         }
     }
     
     @IBOutlet weak var tableView: UITableView! {
         didSet {
-            self.tableView.delegate = self
-            self.tableView.dataSource = self
-            self.tableView.separatorStyle = .none
+            tableView.delegate = self
+            tableView.dataSource = self
+            tableView.separatorStyle = .none
         }
     }
     
@@ -78,25 +78,25 @@ class CharacterDetailViewController: UIViewController, CharacterDetailViewProtoc
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.presenter.viewDidLoad()
+        presenter.viewDidLoad()
     }
     
     func show(_ viewModel: CharacterRepresentableViewModel) {
         self.viewModel = viewModel
-        self.characterImage.image = viewModel.image
-        self.nameLabel.text = viewModel.name
-        self.descriptionLabel.text = viewModel.description
-        self.tableViewData.append(contentsOf:
+        characterImage.image = viewModel.image
+        nameLabel.text = viewModel.name
+        descriptionLabel.text = viewModel.description
+        tableViewData.append(contentsOf:
                                     [viewModel.comics,
                                      viewModel.series,
                                      viewModel.events])
-        self.heartButton.isSelected = viewModel.isFavourite
-        self.tableView.reloadData()
+        heartButton.isSelected = viewModel.isFavourite
+        tableView.reloadData()
     }
     
     @IBAction func didTapHeart(_ sender: Any) {
-        self.heartButton.isSelected.toggle()
-        self.updateFavourite()
+        heartButton.isSelected.toggle()
+        updateFavourite()
     }
 }
 
@@ -106,28 +106,28 @@ extension CharacterDetailViewController: UITableViewDataSource {
     }
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if self.hiddenSections.contains(section) {
+        if hiddenSections.contains(section) {
             return 0
         }
         
-        return self.tableViewData[section].count
+        return tableViewData[section].count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = UITableViewCell()
-        cell.textLabel?.text = self.tableViewData[indexPath.section][indexPath.row]
+        cell.textLabel?.text = tableViewData[indexPath.section][indexPath.row]
         return cell
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         guard let sectionTable = SectionTable(rawValue: section) else { return UIView() }
         let sectionButton = UIButton()
-        sectionButton.setTitle(String(sectionTable.getTitle() + " #\(self.tableViewData[section].count)"),
+        sectionButton.setTitle(String(sectionTable.getTitle() + " #\(tableViewData[section].count)"),
                                for: .normal)
         sectionButton.backgroundColor = .systemBlue
         sectionButton.tag = section
         sectionButton.addTarget(self,
-                                action: #selector(self.hideSection(sender:)),
+                                action: #selector(hideSection(sender:)),
                                 for: .touchUpInside)
         return sectionButton
     }
@@ -139,19 +139,19 @@ private extension CharacterDetailViewController {
         let section = sender.tag
         var indexPath: [IndexPath] {
             var indexPaths = [IndexPath]()
-            for row in 0 ..< self.tableViewData[section].count {
+            for row in 0 ..< tableViewData[section].count {
                 indexPaths.append(IndexPath(row: row,
                                             section: section))
             }
             return indexPaths
         }
         
-        if self.hiddenSections.contains(section) {
-            self.hiddenSections.remove(section)
-            self.tableView.insertRows(at: indexPath, with: .fade)
+        if hiddenSections.contains(section) {
+            hiddenSections.remove(section)
+            tableView.insertRows(at: indexPath, with: .fade)
         } else {
-            self.hiddenSections.insert(section)
-            self.tableView.deleteRows(at: indexPath, with: .fade)
+            hiddenSections.insert(section)
+            tableView.deleteRows(at: indexPath, with: .fade)
         }
     }
     
@@ -164,12 +164,12 @@ private extension CharacterDetailViewController {
             self.heartForegroundImage.alpha = 0.0
             self.heartForegroundImage.transform = CGAffineTransform(scaleX: 1.0, y: 1.0)
         }
-        self.heartButton.isSelected.toggle()
-        self.updateFavourite()
+        heartButton.isSelected.toggle()
+        updateFavourite()
     }
     
     func updateFavourite() {
-        self.viewModel?.isFavourite =  heartButton.isSelected
-        self.presenter.saveFavourite(isFavourite: heartButton.isSelected)
+        viewModel?.isFavourite =  heartButton.isSelected
+        presenter.saveFavourite(isFavourite: heartButton.isSelected)
     }
 }

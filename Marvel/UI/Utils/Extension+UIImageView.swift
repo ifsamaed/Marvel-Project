@@ -1,5 +1,5 @@
 //
-//  extension+image.swift
+//  Extension+UIImageView.swift
 //  Marvel
 //
 //  Created by Margaret López Calderón on 14/8/21.

@@ -13,12 +13,12 @@ class LoadingTableViewCell: UITableViewHeaderFooterView {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.spinner.startAnimating()
+        spinner.startAnimating()
     }
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        self.spinner.startAnimating()
-        self.contentView.backgroundColor = .white
+        spinner.startAnimating()
+        contentView.backgroundColor = .white
     }    
 }

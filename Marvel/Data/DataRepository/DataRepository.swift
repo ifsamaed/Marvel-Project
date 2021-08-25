@@ -9,6 +9,7 @@ import Foundation
 
 protocol DataRepositoryProtocol {
     func getAllCharacters(offset: Int) throws -> CharactersViewModel
+    func getCharacter(_ input: GellAllCharactersInput) throws -> CharactersViewModel
 }
 
 final class DataRepository: DataRepositoryProtocol {
@@ -23,4 +24,11 @@ final class DataRepository: DataRepositoryProtocol {
             .getAllCharacters(inputParam: GellAllCharactersInput(offSet: offset ))
         return CharactersViewModel(response)
     }
+    
+    func getCharacter(_ input: GellAllCharactersInput) throws -> CharactersViewModel {
+        let response = try dataSource
+            .getAllCharacters(inputParam: input)
+        return CharactersViewModel(response)
+    }
+
 }

@@ -10,9 +10,10 @@ import UIKit
 protocol CharacterListViewProtocol: AnyObject {
     func showCharacters(_ viewModels: [CharacterRepresentableViewModel])
     func appendNewCharacters(_ characters: [CharacterRepresentableViewModel])
+    func updatePagination(enable: Bool)
 }
 
-class CharacterListViewController: UITableViewController, CharacterListViewProtocol {
+class CharacterListViewController: UITableViewController {
     
     // MARK: - Value Types
     typealias DataSource = UITableViewDiffableDataSource<CharactersSection, CharacterRepresentableViewModel>
@@ -21,12 +22,11 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     private lazy var tableViewDataSource: DataSource = makeDataSource()
     private lazy var tableViewAdvancedDataSource: UITableViewDiffableDataSource<AdvancedSearchSection, AdvancedSearchViewModel> = makeAdvancedDataSource()
     
-    let mocks = [AdvancedSearchViewModel()]
-
     private let presenter: CharacterListPresenterProtocol
     private var characters: [CharacterRepresentableViewModel] = []
     private var filterCharacters: [CharacterRepresentableViewModel] = []
     private var isFetchingMore: Bool = false
+    private var isFooterViewEnable: Bool = false
     
     enum AdvancedSearchSection: Int {
         case row = 0
@@ -43,19 +43,8 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.configureTableView()
-        self.presenter.viewDidLoad()
-    }
-    
-    func showCharacters(_ viewModels: [CharacterRepresentableViewModel]) {
-        self.characters = viewModels
-        self.updateDataSource(animatingDifferences: false)
-    }
-    
-    func appendNewCharacters(_ characters: [CharacterRepresentableViewModel]) {
-        self.characters.append(contentsOf: characters)
-        self.isFetchingMore = false
-        self.updateDataSource(animatingDifferences: false)
+        configureTableView()
+        presenter.viewDidLoad()
     }
     
     override func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
@@ -71,7 +60,7 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     }
     
     override func tableView(_ tableView: UITableView, heightForFooterInSection section: Int) -> CGFloat {
-        if isFetchingMore {
+        if isFetchingMore && isFooterViewEnable {
             return UITableView.automaticDimension
         } else {
             return .leastNonzeroMagnitude
@@ -79,6 +68,7 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     }
     
     override func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        self.view.endEditing(true)
         let offsetY = scrollView.contentOffset.y
         let contentHeight = scrollView.contentSize.height
         if offsetY > contentHeight - scrollView.frame.size.height {
@@ -89,11 +79,28 @@ class CharacterListViewController: UITableViewController, CharacterListViewProto
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let selectedCharacters =  self.tableViewDataSource.itemIdentifier(for: indexPath) else { return }
-        self.presenter.didTapCharacter(selectedCharacters)
+        guard let selectedCharacters =  tableViewDataSource.itemIdentifier(for: indexPath) else { return }
+        presenter.didTapCharacter(selectedCharacters)
     }
 }
 
+extension CharacterListViewController: CharacterListViewProtocol {
+    func showCharacters(_ viewModels: [CharacterRepresentableViewModel]) {
+        characters = viewModels
+        updateDataSource(animatingDifferences: false)
+    }
+    
+    func appendNewCharacters(_ characters: [CharacterRepresentableViewModel]) {
+        self.characters.append(contentsOf: characters)
+        isFetchingMore = false
+        updateDataSource(animatingDifferences: false)
+    }
+
+    func updatePagination(enable: Bool) {
+        isFetchingMore = !enable
+        isFooterViewEnable = enable
+    }
+}
 private extension CharacterListViewController {
     func makeDataSource() -> DataSource {
         return DataSource(
@@ -118,73 +125,74 @@ private extension CharacterListViewController {
         var snapShot = Snapshot()
         snapShot.appendSections([.main])
         snapShot.appendItems(characters)
-        self.tableViewDataSource.apply(snapShot, animatingDifferences: false)
+        tableViewDataSource.apply(snapShot, animatingDifferences: false)
     }
     
     func updateDataSource(animatingDifferences: Bool = false) {
         var snapShot = Snapshot()
         snapShot.appendSections([.main])
         snapShot.appendItems(characters)
-        self.tableViewDataSource.apply(snapShot, animatingDifferences: animatingDifferences)
+        tableViewDataSource.apply(snapShot, animatingDifferences: animatingDifferences)
     }
 }
 
 private extension CharacterListViewController {
     func beginBatchFetch() {
-        self.isFetchingMore = true
-        self.updateDataSource()
+        isFetchingMore = true
+        isFooterViewEnable = true
+        updateDataSource()
         DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
             self.presenter.loadMoreCharacters()
         }
     }
     
     func registerCells() {
-        self.tableView.register(UINib(nibName: "CharacterTableViewCell", bundle: nil), forCellReuseIdentifier: "CharacterTableViewCell")
-        self.tableView.register(UINib(nibName: "SearchHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SearchHeaderView")
-        self.tableView.register(UINib(nibName: "LoadingTableViewCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "LoadingTableViewCell")
-        self.tableView.register(UINib(nibName: "AdvancedSearchCell", bundle: nil), forCellReuseIdentifier: "AdvancedSearchCell")
+        tableView.register(UINib(nibName: "CharacterTableViewCell", bundle: nil), forCellReuseIdentifier: "CharacterTableViewCell")
+        tableView.register(UINib(nibName: "SearchHeaderView", bundle: nil), forHeaderFooterViewReuseIdentifier: "SearchHeaderView")
+        tableView.register(UINib(nibName: "LoadingTableViewCell", bundle: nil), forHeaderFooterViewReuseIdentifier: "LoadingTableViewCell")
+        tableView.register(UINib(nibName: "AdvancedSearchCell", bundle: nil), forCellReuseIdentifier: "AdvancedSearchCell")
     }
     
     func configureTableView() {
-        self.registerCells()
-        self.tableView.separatorStyle = .none
-        self.tableView.backgroundColor = .clear
-        self.tableViewDataSource.defaultRowAnimation = .fade
-        self.tableView.tableFooterView?.isHidden = true
+        registerCells()
+        tableView.separatorStyle = .none
+        tableView.backgroundColor = .clear
+        tableViewDataSource.defaultRowAnimation = .fade
+        tableView.tableFooterView?.isHidden = true
 
     }
 }
 
 extension CharacterListViewController: SearchHeaderViewDelegate {
     func updateSearchResults(_ searchText: String) {
-        self.tableView.scrollToTop(animated: true)
+        isFooterViewEnable = false
+        isFetchingMore = true
+        tableView.scrollToTop(animated: true)
         guard !searchText.isEmpty else {
-            self.filterCharacters = []
-            self.updateDataSource(characters)
+            isFetchingMore = false
+            isFooterViewEnable = true
+            filterCharacters = []
+            updateDataSource(characters)
             return
         }
-        self.filterCharacters = self.characters.filter { $0.name.contains(searchText) }
-        self.updateDataSource(filterCharacters)
+        filterCharacters = characters.filter { $0.name.contains(searchText) }
+        updateDataSource(filterCharacters)
     }
     
     func didTapOnAdvancedSearch() {
-//        var snapShot = NSDiffableDataSourceSnapshot<AdvancedSearchSection, AdvancedSearchViewModel>()
-//        snapShot.appendSections([.row])
-//        snapShot.appendItems(mocks)
-//        self.tableViewAdvancedDataSource.apply(snapShot, animatingDifferences: false)
+        self.presenter.didTapOnAdvancedSearch()
     }
-
 }
 
 private extension UITableView {
     func hasRowAtIndexPath(indexPath: IndexPath) -> Bool {
-        return indexPath.section < self.numberOfSections && indexPath.row < self.numberOfRows(inSection: indexPath.section)
+        return indexPath.section < numberOfSections && indexPath.row < numberOfRows(inSection: indexPath.section)
     }
     
     func scrollToTop(animated: Bool) {
         let indexPath = IndexPath(row: 0, section: 0)
-        if self.hasRowAtIndexPath(indexPath: indexPath) {
-            self.scrollToRow(at: indexPath, at: .top, animated: animated)
+        if hasRowAtIndexPath(indexPath: indexPath) {
+            scrollToRow(at: indexPath, at: .top, animated: animated)
         }
     }
 }

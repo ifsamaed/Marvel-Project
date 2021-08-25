@@ -20,9 +20,9 @@ struct FavouriteCharacterRepresentableViewModel: Hashable, FavouriteItem {
     let name: String?
 
     func hash(into hasher: inout Hasher) {
-        hasher.combine(self.id)
-        hasher.combine(self.image)
-        hasher.combine(self.name)
+        hasher.combine(id)
+        hasher.combine(image)
+        hasher.combine(name)
 
     }
     

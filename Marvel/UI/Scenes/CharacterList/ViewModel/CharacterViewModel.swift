@@ -24,8 +24,8 @@ class CharacterRepresentableViewModel: Hashable {
     var isFavourite: Bool = false
     
     func hash(into hasher: inout Hasher) {
-        hasher.combine(self.characterID)
-        hasher.combine(self.name)
+        hasher.combine(characterID)
+        hasher.combine(name)
     }
     
     static func == (lsh: CharacterRepresentableViewModel, rhs: CharacterRepresentableViewModel) -> Bool {

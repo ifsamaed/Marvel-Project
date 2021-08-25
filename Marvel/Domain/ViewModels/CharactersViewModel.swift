@@ -15,11 +15,11 @@ struct CharactersViewModel {
     let characters: [CharacterViewModel]
     
     init(_ dto: Characters) {
-        self.offset = dto.data?.offset ?? -1
-        self.limit = dto.data?.offset ?? -1
-        self.total = dto.data?.total ?? -1
-        self.count = dto.data?.count ?? -1
-        self.characters = dto.data?.results?
+        offset = dto.data?.offset ?? -1
+        limit = dto.data?.offset ?? -1
+        total = dto.data?.total ?? -1
+        count = dto.data?.count ?? -1
+        characters = dto.data?.results?
             .map { CharacterViewModel($0) } ?? []
     }
 }
@@ -36,15 +36,15 @@ struct CharacterViewModel {
     let urls: [URLTypeViewModel]
     
     init(_ dto: CharactersResult) {
-        self.characterID = dto.id ?? UUID().hashValue
-        self.name = dto.name ?? ""
-        self.description = dto.resultDescription
-        self.thumbnail = ThumbnailViewModel(dto.thumbnail)
-        self.resourceURI = dto.resourceURI
-        self.comics = ItemViewModel(dto.comics)
-        self.series = ItemViewModel(dto.series)
-        self.event = ItemViewModel(dto.events)
-        self.urls = dto.urls?.map { URLTypeViewModel($0) } ?? []
+        characterID = dto.id ?? UUID().hashValue
+        name = dto.name ?? ""
+        description = dto.resultDescription
+        thumbnail = ThumbnailViewModel(dto.thumbnail)
+        resourceURI = dto.resourceURI
+        comics = ItemViewModel(dto.comics)
+        series = ItemViewModel(dto.series)
+        event = ItemViewModel(dto.events)
+        urls = dto.urls?.map { URLTypeViewModel($0) } ?? []
     }
 }
 
@@ -54,9 +54,9 @@ struct ItemViewModel {
     let items: [ItemDetailViewModel]
     
     init(_ dto: Comics?) {
-        self.available = dto?.available
-        self.collectionURI = dto?.collectionURI
-        self.items = dto?.items?.map { ItemDetailViewModel($0) } ?? []
+        available = dto?.available
+        collectionURI = dto?.collectionURI
+        items = dto?.items?.map { ItemDetailViewModel($0) } ?? []
     }
 }
 
@@ -66,9 +66,9 @@ struct ItemDetailViewModel {
     let type: String?
     
     init(_ dto: ComicsItem?) {
-        self.resourceURI = dto?.resourceURI
-        self.name = dto?.name
-        self.type = nil
+        resourceURI = dto?.resourceURI
+        name = dto?.name
+        type = nil
     }
 }
 
@@ -77,8 +77,8 @@ struct ThumbnailViewModel {
     let thumbnailExtension: String
     
     init(_ dto: Thumbnail?) {
-        self.path = dto?.path ?? ""
-        self.thumbnailExtension = dto?.thumbnailExtension ?? ""
+        path = dto?.path ?? ""
+        thumbnailExtension = dto?.thumbnailExtension ?? ""
     }
     
     var imageURL: String {
@@ -103,7 +103,7 @@ struct URLTypeViewModel {
     let url: String?
     
     init(_ dto: URLElement?) {
-        self.type = URLType(rawValue: dto?.type ?? "")
-        self.url = dto?.url ?? ""
+        type = URLType(rawValue: dto?.type ?? "")
+        url = dto?.url ?? ""
     }
 }

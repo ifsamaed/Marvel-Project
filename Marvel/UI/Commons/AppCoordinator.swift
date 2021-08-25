@@ -13,7 +13,3 @@ protocol Coordinator {
     var rootViewController: UIViewController { get set }
     func start() -> UIViewController
 }
-
-protocol HomeBaseCoordinated {
-    var coordinator: CharactersBaseCoordinator? { get }
-}

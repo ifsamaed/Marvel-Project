@@ -6,7 +6,6 @@
 //
 
 import UIKit
-import Foundation
 
 final class ImageDataRepository {
     static let shared = ImageDataRepository()
@@ -15,11 +14,10 @@ final class ImageDataRepository {
     private var imageCache = ImageCache()
     
     func load(url: NSURL, item: CharacterRepresentableViewModel, completion: @escaping (CharacterRepresentableViewModel, UIImage?) -> Void) {
-        if let image = self.imageCache.load(url: url, item: item) {
+        if let image = imageCache.load(url: url, item: item) {
             completion(item, image)
             return
         }
-        
         let task = URLSession.shared.dataTask(with: url as URL) { (data, response, error) in
             defer { self.runningRequests.removeValue(forKey: item) }
             guard

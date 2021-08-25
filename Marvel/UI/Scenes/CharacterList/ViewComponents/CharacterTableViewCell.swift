@@ -10,23 +10,23 @@ import UIKit
 final class CharacterTableViewCell: UITableViewCell {
     @IBOutlet weak var characterImage: UIImageView! {
         didSet {
-            self.characterImage.clipsToBounds = true
-            self.characterImage.layer.cornerRadius = 10
-            self.characterImage.contentMode = .scaleToFill
+            characterImage.clipsToBounds = true
+            characterImage.layer.cornerRadius = 10
+            characterImage.contentMode = .scaleToFill
         }
     }
     @IBOutlet weak var containerDetailCharacterView: UIView! {
         didSet {
-            self.containerDetailCharacterView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
-            self.containerDetailCharacterView.clipsToBounds = true
-            self.containerDetailCharacterView.layer.cornerRadius = 10
+            containerDetailCharacterView.backgroundColor = UIColor.black.withAlphaComponent(0.5)
+            containerDetailCharacterView.clipsToBounds = true
+            containerDetailCharacterView.layer.cornerRadius = 10
         }
     }
     @IBOutlet weak var characterName: UILabel! {
         didSet {
-            self.characterName.numberOfLines = 2
-            self.characterName.font = UIFont.boldSystemFont(ofSize: 18)
-            self.characterName.textColor = .white
+            characterName.numberOfLines = 2
+            characterName.font = UIFont.boldSystemFont(ofSize: 18)
+            characterName.textColor = .white
         }
     }
     
@@ -36,7 +36,7 @@ final class CharacterTableViewCell: UITableViewCell {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        self.selectionStyle = .none
+        selectionStyle = .none
     }
     
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -45,24 +45,24 @@ final class CharacterTableViewCell: UITableViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.characterImage.image = nil
-        self.characterImage.cancelImageLoad()
-        self.spinner.isHidden = true
+        characterImage.image = nil
+        characterImage.cancelImageLoad()
+        spinner.isHidden = true
     }
     
     func configure(_ viewModel: CharacterRepresentableViewModel) {
         self.viewModel = viewModel
-        self.characterImage.image = viewModel.image
-        self.characterName.text = viewModel.name
+        characterImage.image = viewModel.image
+        characterName.text = viewModel.name
         if viewModel.image == nil {
-            self.loadImage()
+            loadImage()
         }
     }
     
     func loadImage() {
-        self.spinner.startAnimating()
-        self.spinner.isHidden = false
-        guard let viewModel = self.viewModel,
+        spinner.startAnimating()
+        spinner.isHidden = false
+        guard let viewModel = viewModel,
               let url = viewModel.url else { return }
         characterImage.loadImage(at: url as URL, for: viewModel) { [weak self] in
             self?.spinner.stopAnimating()

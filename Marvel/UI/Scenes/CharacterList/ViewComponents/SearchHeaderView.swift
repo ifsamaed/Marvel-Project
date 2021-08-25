@@ -34,22 +34,22 @@ class SearchHeaderView: UITableViewHeaderFooterView {
     }
     
     func setupView() {
-        self.layer.backgroundColor = UIColor.white.withAlphaComponent(0.9).cgColor
+        layer.backgroundColor = UIColor.white.withAlphaComponent(0.9).cgColor
     }
     
     func configureView() {
-        self.searchBar.placeholder = "Filter by Name"
-        self.searchBar.delegate = self
+        searchBar.placeholder = "Filter by Name"
+        searchBar.delegate = self
     }
     
     @IBAction func didTapOnMoreButton(_ sender: Any) {
-        self.delegate?.didTapOnAdvancedSearch()
+        delegate?.didTapOnAdvancedSearch()
     }
     
 }
 
 extension SearchHeaderView: UISearchBarDelegate {
     func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        self.delegate?.updateSearchResults(searchText)
+        delegate?.updateSearchResults(searchText)
     }
 }

@@ -23,10 +23,10 @@ final class FavouritesCoordinator: FavouritesBaseCoordinator {
     }
     
     func start() -> UIViewController {
-        guard let container = self.container else { return UIViewController() }
+        guard let container = container else { return UIViewController() }
         let presenter = FavouriteCharacterPresenter(container: container)
         let viewController = FavouriteCharacterTableViewController(presenter: presenter)
-        self.rootViewController = UINavigationController(rootViewController: viewController)
+        rootViewController = UINavigationController(rootViewController: viewController)
         presenter.view = viewController
         return rootViewController
     }

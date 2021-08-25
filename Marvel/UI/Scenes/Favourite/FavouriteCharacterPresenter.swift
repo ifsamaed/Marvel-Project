@@ -24,14 +24,14 @@ final class FavouriteCharacterPresenter: FavouriteCharacterPresenterProtocol {
     }
     
     func viewWillAppear() {
-        self.characters = PersistentFavouriteContainer.fetchFavourites(context: container.viewContext)
-        self.view?.showCharacters(characters)
+        characters = PersistentFavouriteContainer.fetchFavourites(context: container.viewContext)
+        view?.showCharacters(characters)
     }
     
     func removeFavourite(_ indexPath: IndexPath) {
         do {
             try PersistentFavouriteContainer.removeFavourite(characters[indexPath.row], backgroundContext: container.viewContext)
-            self.characters = PersistentFavouriteContainer.fetchFavourites(context: container.viewContext)
+            characters = PersistentFavouriteContainer.fetchFavourites(context: container.viewContext)
             view?.updateDeleteCharacter(characters, index: indexPath)
         } catch let error {
             view?.showError(error.localizedDescription)

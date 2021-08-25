@@ -32,7 +32,7 @@ final class CharacterDetailPresenter: CharacterDetailPresenterProtocol {
                 context: container.viewContext
             )
         ) ?? false
-        self.view?.show(viewModel)
+        view?.show(viewModel)
     }
     
     func saveFavourite(isFavourite: Bool) {

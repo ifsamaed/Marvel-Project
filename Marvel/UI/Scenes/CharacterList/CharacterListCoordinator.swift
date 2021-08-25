@@ -10,7 +10,7 @@ import CoreData
 
 protocol CharactersBaseCoordinator: Coordinator {
     func showDetail(viewModel: CharacterRepresentableViewModel)
-    func showAdvancedSearch()
+    func showAdvancedSearch(delegate: AdvancedSearchDelegate)
 }
 
 final class CharactersCoordinator: CharactersBaseCoordinator {
@@ -24,20 +24,28 @@ final class CharactersCoordinator: CharactersBaseCoordinator {
     func start() -> UIViewController {
         let presenter = CharacterListPresenter(coordinator: self)
         let viewController = CharacterListViewController(presenter: presenter)
-        self.rootViewController = UINavigationController(rootViewController: viewController)
+        rootViewController = UINavigationController(rootViewController: viewController)
         presenter.view = viewController
+        self.setupUseCase(presenter: presenter)
         return rootViewController
     }
     
     func showDetail(viewModel: CharacterRepresentableViewModel) {
-        let presenter = CharacterDetailPresenter(viewModel, container: self.container!)
-        let viewController = CharacterDetailViewController(presenter: presenter)
-        presenter.view = viewController
-        self.rootViewController.present(viewController, animated: true, completion: nil)
+        guard let container = self.container else { return }
+        let coordinator = CharacterDetailCoordinator(viewModel: viewModel, container: container)
+        let viewController = coordinator.start()
+        rootViewController.present(viewController, animated: true, completion: nil)
     }
     
-    func showAdvancedSearch() {
-        let viewController = AdvancedSearch()
-        self.rootViewController.present(viewController, animated: true, completion: nil)
+    func showAdvancedSearch(delegate: AdvancedSearchDelegate) {
+        let viewController = AdvancedSearchViewCoordinator(delegate: delegate).start()
+        rootViewController.present(viewController, animated: true, completion: nil)
+    }
+}
+
+private extension CharactersCoordinator {
+    func setupUseCase(presenter: CharacterListPresenter) {
+        presenter.getCharacterListUseCase = GetCharactersUseCase(repository: DataRepository(dataSource: NetworkingDataSource()))
+        presenter.searchCharacterUseCase = SearchCharacterUseCase(repository: DataRepository(dataSource: NetworkingDataSource()))
     }
 }

@@ -27,34 +27,35 @@ final class CharacterListPresenter: CharacterListPresenterProtocol {
     init(coordinator: CharactersBaseCoordinator) {
         self.coordinator = coordinator
     }
-
+    
+    var getCharacterListUseCase: GetCharactersUseCase?
+    var searchCharacterUseCase: SearchCharacterUseCase?
+    
     func viewDidLoad() {
-        let characters = self.loadCharacters()
-        self.view?.showCharacters(characters)
+        let characters = loadCharacters()
+        view?.showCharacters(characters)
     }
     
     func loadMoreCharacters() {
-        let characters = self.loadCharacters()
-        self.view?.appendNewCharacters(characters)
+        let characters = loadCharacters()
+        view?.appendNewCharacters(characters)
     }
     
     func didTapCharacter(_ character: CharacterRepresentableViewModel) {
-        self.coordinator.showDetail(viewModel: character)
+        coordinator.showDetail(viewModel: character)
     }
     
     func didTapOnAdvancedSearch() {
-        self.coordinator.showAdvancedSearch()
+        coordinator.showAdvancedSearch(delegate: self)
     }
 }
 
 private extension CharacterListPresenter {
     func loadCharacters() -> [CharacterRepresentableViewModel] {
         do {
-            guard offset > limit else {
+            guard offset > limit, let charactersDomain = try getCharacterListUseCase?.execute(offset: offset) else {
                 return []
             }
-            let charactersDomain = try GetCharactersUseCase(repository: DataRepository(dataSource: NetworkingDataSource()))
-                .execute(offset: offset)
             let charactersViewModelRepresentable = charactersDomain
                 .characters
                 .map { CharacterRepresentableViewModel(
@@ -66,11 +67,50 @@ private extension CharacterListPresenter {
                     series: $0.series.items.map { $0.name ?? "" },
                     events: $0.event.items.map { $0.name ?? ""}
                 )}
-            self.offset += charactersViewModelRepresentable.count
-            self.limit = charactersDomain.limit
+            offset += charactersViewModelRepresentable.count
+            limit = charactersDomain.limit
             return charactersViewModelRepresentable
         } catch {
             return []
         }
+    }
+}
+
+extension CharacterListPresenter: AdvancedSearchDelegate {
+    func search(name: String?, nameStartWithLabel: String?, comics: Int?) {
+        do {
+            let characters = try searchCharacterUseCase?.execute(input: GellAllCharactersInput(name: name,
+                                                                                               nameStartsWith: nameStartWithLabel,
+                                                                                               comics: comics))
+            let charactersViewModelRepresentable = characters?
+                .characters
+                .map { CharacterRepresentableViewModel(
+                    characterID: $0.characterID,
+                    name: $0.name,
+                    description: $0.description ?? "",
+                    url: $0.thumbnail?.imageURL ?? "",
+                    comics: $0.comics.items.map { $0.name ?? "" },
+                    series: $0.series.items.map { $0.name ?? "" },
+                    events: $0.event.items.map { $0.name ?? ""}
+                )} ?? []
+            view?.updatePagination(enable: false)
+            view?.showCharacters(charactersViewModelRepresentable)
+        } catch let error {
+            print("error: \(error)")
+        }
+    }
+    
+    func showAllCharacters() {
+        resetValues()
+        let characters = loadCharacters()
+        view?.updatePagination(enable: true)
+        view?.showCharacters(characters)
+    }
+    
+    func resetValues() {
+        self.offset = 0
+        self.limit = -1
+        self.total = 0
+        self.count = 0
     }
 }

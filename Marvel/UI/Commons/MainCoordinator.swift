@@ -22,7 +22,7 @@ final class MainCoordinator {
         
         (rootViewController as? UITabBarController)?.viewControllers = [charactersViewController, favoriteViewController]
         
-        self.rootViewController.view.backgroundColor = .white
+        rootViewController.view.backgroundColor = .white
         return rootViewController
     }
 }

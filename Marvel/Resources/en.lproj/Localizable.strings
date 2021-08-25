@@ -1,0 +1,16 @@
+/* 
+  Localizable.strings
+  Marvel
+
+  Created by Margaret López Calderón on 25/8/21.
+  
+*/
+"AdvancedSearchViewController.title.label" = "Advanced search";
+"AdvancedSearchViewController.name.label" = "Name";
+"AdvancedSearchViewController.name.start.with.label" = "Name start with";
+"AdvancedSearchViewController.comics" = "Comic";
+"search.button.title" = "Buscar";
+"AdvancedSearchViewController.show.all.characters.button" = "Mostrar todos los personajes";
+"AdvancedSearchViewController.alert.title.empty.value" = "Cuidado";
+"AdvancedSearchViewController.alert.description.empty.value" = "No hay ningún valor. Introduce por lo menos uno";
+"AdvancedSearchViewController.alert.accept" = "Aceptar";
