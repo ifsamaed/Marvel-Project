@@ -15,7 +15,7 @@ Consume Marvel API: https://developer.marvel.com/docs
 The architecture is based on **MVP-C** with a coordinator pattern to help us decouple the flow app from the view controllers
 
 ## Requirements
-- iOS 13.0+
+- iOS 14.1+
 - XCode 11.0+
 - Swift 5
 
@@ -26,11 +26,11 @@ The architecture is based on **MVP-C** with a coordinator pattern to help us dec
 - **Efficiently loading images**
 - **Infinite scrolling**
 - **Filter character**
+- **Core Data**
+- Add advanced searching
 
 ## Next improvements 
-- Show loading view at the end of table view 
 - Show empty view at favourites view controller 
-- Add new search filters
 - UI Test
 - Animate modal presentation
 
